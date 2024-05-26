@@ -155,6 +155,7 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 
 vim.opt.foldmethod = 'indent'
+vim.opt.foldlevelstart = 99
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -372,7 +373,14 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
+        defaults = {
+          vimgrep_arguments = { 'rg', '--hidden', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
