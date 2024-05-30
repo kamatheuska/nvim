@@ -84,12 +84,14 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
+vim.opt.relativenumber = true
 -- Format enabled globally conform
 vim.b.disable_autoformat = false
 vim.g.disable_autoformat = false
@@ -366,6 +368,7 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+
         pickers = {
           find_files = {
             hidden = true,
@@ -664,6 +667,27 @@ require('lazy').setup({
       })
 
       require('conform').setup {
+        log_level = vim.log.levels.DEBUG,
+        notify_on_error = true,
+        formatters_by_ft = {
+          lua = { 'stylua' },
+          -- Conform can also run multiple formatters sequentially
+          -- python = { "isort", "black" },
+          --
+          -- You can use a sub-list to tell conform to run *until* a formatter
+          -- is found.
+          python = { "black" },
+          typescript = { { "prettierd", "prettier" } },
+          typescriptreact = { { "prettierd", "prettier" } },
+          javascript = { { "prettierd", "prettier" } },
+          javascriptreact = { { "prettierd", "prettier" } },
+          css = { "prettier" },
+          html = { "prettier" },
+          json = { "prettier" },
+          yaml = { "prettier" },
+          markdown = { "prettier" },
+          graphql = { "prettier" },
+        },
         format_on_save = function(bufnr)
           -- Disable "format_on_save lsp_fallback" for languages that don't
           -- have a well standardized coding style. You can add additional
@@ -689,19 +713,6 @@ require('lazy').setup({
         end,
         mode = '',
         desc = '[F]ormat buffer',
-      },
-    },
-    opts = {
-      notify_on_error = true,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        javascript = { { 'prettierd', 'prettier' } },
-        javascriptreact = { { 'prettierd', 'prettier' } },
       },
     },
   },
@@ -822,6 +833,35 @@ require('lazy').setup({
     priority = 1000,
     opts = {},
   },
+  {
+    "rebelot/kanagawa.nvim",
+    config = function(self, opts)
+      require('kanagawa').setup({
+        compile = false,  -- enable compiling the colorscheme
+        undercurl = true, -- enable undercurls
+        commentStyle = { italic = true },
+        functionStyle = {},
+        keywordStyle = { italic = true },
+        statementStyle = { bold = true },
+        typeStyle = {},
+        transparent = false,   -- do not set background color
+        dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
+        terminalColors = true, -- define vim.g.terminal_color_{0,17}
+        colors = {             -- add/modify theme and palette colors
+          palette = {},
+          theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+        },
+        overrides = function(colors) -- add/modify highlights
+          return {}
+        end,
+        theme = "wave",    -- Load "wave" theme when 'background' option is not set
+        background = {     -- map the value of 'background' option to a theme
+          dark = "dragon", -- try "dragon" !
+          light = "lotus"
+        },
+      })
+    end
+  },
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
@@ -833,7 +873,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'onedark'
+      vim.cmd.colorscheme 'kanagawa'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -860,6 +900,9 @@ require('lazy').setup({
           parameters = "NONE",
           conditionals = "bold",
           virtual_text = "NONE",
+        },
+
+        colors = {
         }
       })
     end
