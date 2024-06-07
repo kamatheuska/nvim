@@ -89,7 +89,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
+vim.opt.relativenumber = true
 -- Format enabled globally conform
 vim.b.disable_autoformat = false
 vim.g.disable_autoformat = false
@@ -244,7 +244,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',    opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -281,7 +281,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -333,7 +333,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -366,6 +366,7 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+
         pickers = {
           find_files = {
             hidden = true,
@@ -433,11 +434,11 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim',       opts = {} },
+      { 'folke/neodev.nvim', opts = {} },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -664,6 +665,27 @@ require('lazy').setup({
       })
 
       require('conform').setup {
+        log_level = vim.log.levels.DEBUG,
+        notify_on_error = true,
+        formatters_by_ft = {
+          lua = { 'stylua' },
+          -- Conform can also run multiple formatters sequentially
+          -- python = { "isort", "black" },
+          --
+          -- You can use a sub-list to tell conform to run *until* a formatter
+          -- is found.
+          python = { 'black' },
+          typescript = { { 'prettier' } },
+          typescriptreact = { { 'prettier' } },
+          javascript = { { 'prettier' } },
+          javascriptreact = { { 'prettier' } },
+          css = { 'prettier' },
+          html = { 'prettier' },
+          json = { 'prettier' },
+          yaml = { 'prettier' },
+          markdown = { 'prettier' },
+          graphql = { 'prettier' },
+        },
         format_on_save = function(bufnr)
           -- Disable "format_on_save lsp_fallback" for languages that don't
           -- have a well standardized coding style. You can add additional
@@ -689,19 +711,6 @@ require('lazy').setup({
         end,
         mode = '',
         desc = '[F]ormat buffer',
-      },
-    },
-    opts = {
-      notify_on_error = true,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        javascript = { { 'prettierd', 'prettier' } },
-        javascriptreact = { { 'prettierd', 'prettier' } },
       },
     },
   },
@@ -817,52 +826,83 @@ require('lazy').setup({
     end,
   },
   {
-    "folke/tokyonight.nvim",
+    'folke/tokyonight.nvim',
     lazy = false,
     priority = 1000,
     opts = {},
+  },
+  {
+    'rebelot/kanagawa.nvim',
+    config = function(self, opts)
+      require('kanagawa').setup {
+        compile = false, -- enable compiling the colorscheme
+        undercurl = true, -- enable undercurls
+        commentStyle = { italic = true },
+        functionStyle = {},
+        keywordStyle = { italic = true },
+        statementStyle = { bold = true },
+        typeStyle = {},
+        transparent = false, -- do not set background color
+        dimInactive = false, -- dim inactive window `:h hl-NormalNC`
+        terminalColors = true, -- define vim.g.terminal_color_{0,17}
+        colors = { -- add/modify theme and palette colors
+          palette = {},
+          theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+        },
+        overrides = function(colors) -- add/modify highlights
+          return {}
+        end,
+        theme = 'wave', -- Load "wave" theme when 'background' option is not set
+        background = { -- map the value of 'background' option to a theme
+          dark = 'dragon', -- try "dragon" !
+          light = 'lotus',
+        },
+      }
+    end,
   },
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    "olimorris/onedarkpro.nvim",
+    'olimorris/onedarkpro.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'onedark'
+      vim.cmd.colorscheme 'kanagawa'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
     end,
     config = function()
-      require("onedarkpro").setup({
+      require('onedarkpro').setup {
         highlights = {
           Comment = { italic = true },
           Directory = { bold = true },
-          ErrorMsg = { italic = true, bold = true }
+          ErrorMsg = { italic = true, bold = true },
         },
 
         styles = {
-          types = "NONE",
-          methods = "NONE",
-          numbers = "NONE",
-          strings = "NONE",
-          comments = "italic",
-          keywords = "bold",
-          constants = "NONE",
-          functions = "italic",
-          operators = "NONE",
-          variables = "NONE",
-          parameters = "NONE",
-          conditionals = "bold",
-          virtual_text = "NONE",
-        }
-      })
-    end
+          types = 'NONE',
+          methods = 'NONE',
+          numbers = 'NONE',
+          strings = 'NONE',
+          comments = 'italic',
+          keywords = 'bold',
+          constants = 'NONE',
+          functions = 'italic',
+          operators = 'NONE',
+          variables = 'NONE',
+          parameters = 'NONE',
+          conditionals = 'bold',
+          virtual_text = 'NONE',
+        },
+
+        colors = {},
+      }
+    end,
   },
 
   -- Highlight todo, notes, etc in comments
