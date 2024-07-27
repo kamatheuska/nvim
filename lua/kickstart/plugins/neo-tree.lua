@@ -15,6 +15,20 @@ return {
   },
   opts = {
     filesystem = {
+      filtered_items = {
+        always_show = {
+          '.env',
+          '.gitignore',
+          '.vscode',
+          '.eslintrc',
+          '.github',
+          '.sequelizerc',
+          '.snyk',
+          '.yarnrc',
+          '.husky',
+        },
+      },
+      hide_dotfiles = false,
       window = {
         mappings = {
           ['\\'] = 'close_window',
