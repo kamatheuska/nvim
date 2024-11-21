@@ -196,6 +196,13 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.keymap.set('n', '<leader>of', function()
+  local repoUrl = vim.fn.trim(vim.fn.system "git remote get-url origin | sed 's/.git$//' | sed 's/.github.com:/.github.com\\//' | sed 's/git./https:\\/\\//'")
+  local relative_path = '/blob/development/' .. vim.fn.expand '%:.'
+  local url = repoUrl .. relative_path
+  vim.notify('Opening url in the browser: ' .. url)
+  os.execute('open ' .. url)
+end)
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
