@@ -618,7 +618,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         jsonls = {
-          capabilities = capabilities
+          capabilities = capabilities,
         },
         -- clangd = {},
         -- gopls = {},
@@ -631,6 +631,15 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
+        ts_ls = {
+          init_options = {
+            preferences = {
+              importModuleSpecifierPreference = 'relative',
+              importModuleSpecifierEnding = 'minimal',
+            },
+          },
+        },
+
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -665,6 +674,7 @@ require('lazy').setup({
 
       require('mason-lspconfig').setup {
         handlers = {
+
           function(server_name)
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
