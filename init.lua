@@ -94,6 +94,10 @@ vim.opt.relativenumber = true
 vim.b.disable_autoformat = false
 vim.g.disable_autoformat = false
 
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+vim.opt.tabstop = 4
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -173,11 +177,6 @@ vim.keymap.set('n', '<leader>ñ', vim.diagnostic.goto_next, { desc = 'Go to next
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Quickfix shortcuts
-vim.keymap.set('n', '<leader>n', '<cmd>cnext<CR>zz', { desc = 'Forward qfixlist' })
-vim.keymap.set('n', '<leader>p', '<cmd>cprev<CR>zz', { desc = 'Backward qfixlist' })
-vim.keymap.set('n', '<leader>p', '<cmd>cprev<CR>zz', { desc = 'Backward qfixlist' })
-
 -- Open vim buffer instead of floating window for lazygit
 -- https://github.com/kdheepak/lazygit.nvim/issues/22
 -- Set GIT_EDITOR to use nvr if Neovim and nvr are available
@@ -207,13 +206,28 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+--
+-- Custom commands
+--
+
+--
+-- Command to get the remote URL on github of a file
+--
 vim.keymap.set('n', '<leader>of', function()
   local repoUrl = vim.fn.trim(vim.fn.system "git remote get-url origin | sed 's/.git$//' | sed 's/.github.com:/.github.com\\//' | sed 's/git./https:\\/\\//'")
   local relative_path = '/blob/development/' .. vim.fn.expand '%:.'
   local url = repoUrl .. relative_path
   vim.notify('Opening url in the browser: ' .. url)
   os.execute('open ' .. url)
-end)
+end, { desc = 'Get remote URL from current file' })
+
+--
+-- Moving on a Quickfix list
+--
+vim.keymap.set('n', '<leader>cn', '<cmd>cnext<cr>zz', { desc = 'Move to the next item in a Quickfix list' })
+vim.keymap.set('n', '<leader>cp', '<cmd>cprev<cr>zz', { desc = 'Move to the previous item in a Quickfix list' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -945,7 +959,7 @@ require('lazy').setup({
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight'
       -- vim.cmd.colorscheme 'nord'
-      vim.cmd.colorscheme 'tokyonight-storm'
+      vim.cmd.colorscheme 'kanagawa-wave'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
