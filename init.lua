@@ -781,12 +781,18 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              local luasnip = require 'luasnip'
+
+              require('luasnip.loaders.from_vscode').lazy_load()
+
+              luasnip.filetype_extend('html', { 'loremipsum' })
+              luasnip.filetype_extend('html', { 'html' })
+              luasnip.filetype_extend('typescriptreact', { 'html' })
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -802,7 +808,6 @@ require('lazy').setup({
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
-
       cmp.setup {
         snippet = {
           expand = function(args)
@@ -945,7 +950,7 @@ require('lazy').setup({
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight'
       -- vim.cmd.colorscheme 'nord'
-      vim.cmd.colorscheme 'tokyonight-storm'
+      vim.cmd.colorscheme 'kanagawa-dragon'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
