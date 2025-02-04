@@ -103,6 +103,7 @@ vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -624,6 +625,7 @@ require('lazy').setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local util = require 'lspconfig.util'
+
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
@@ -639,6 +641,48 @@ require('lazy').setup({
       local servers = {
         jsonls = {
           capabilities = capabilities,
+        },
+        eslint = {
+          cmd = { 'vscode-eslint-language-server', '--stdio' },
+          filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx', 'vue', 'svelte', 'astro' },
+          settings = {
+            codeAction = {
+              disableRuleComment = {
+                enable = true,
+                location = 'separateLine',
+              },
+              showDocumentation = {
+                enable = true,
+              },
+            },
+            codeActionOnSave = {
+              enable = false,
+              mode = 'all',
+            },
+            experimental = {
+              useFlatConfig = true,
+            },
+            debug = true,
+            -- nodePath = '',
+            -- onIgnoredFiles = 'off',
+            -- problems = {
+            --   shortenToSingleLine = false,
+            -- },
+            -- quiet = fase,
+            -- rulesCustomizations = {},
+            -- run = 'onType',
+            -- useESLintClass = false,
+            -- validate = 'on',
+            -- workingDirectory = {
+            --   mode = 'location',
+            -- },
+          },
+          on_attach = function(client, bufnr)
+            vim.api.nvim_create_autocmd('BufWritePre', {
+              buffer = bufnr,
+              command = 'EslintFixAll',
+            })
+          end,
         },
         -- clangd = {},
         -- gopls = {},
