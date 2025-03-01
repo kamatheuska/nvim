@@ -455,6 +455,7 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -972,19 +973,24 @@ require('lazy').setup({
     'rebelot/kanagawa.nvim',
     config = function()
       require('kanagawa').setup {
-        compile = false, -- enable compiling the colorscheme
+        compile = true, -- enable compiling the colorscheme
         undercurl = true, -- enable undercurls
         commentStyle = { italic = true },
-        functionStyle = {},
+        functionStyle = { bold = true },
         keywordStyle = { italic = true },
         statementStyle = { bold = true },
-        typeStyle = {},
-        transparent = false, -- do not set background color
-        dimInactive = false, -- dim inactive window `:h hl-NormalNC`
+        typeStyle = { italic = true, bold = true },
+        transparent = true, -- do not set background color
+        dimInactive = true, -- dim inactive window `:h hl-NormalNC`
         terminalColors = true, -- define vim.g.terminal_color_{0,17}
         colors = { -- add/modify theme and palette colors
           palette = {},
           theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+        },
+        theme = 'wave',
+        background = {
+          dark = 'wave',
+          light = 'lotus',
         },
         overrides = function(colors)
           local theme = colors.theme
@@ -1035,11 +1041,9 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight'
-      -- vim.cmd.colorscheme 'nord'
-      vim.cmd.colorscheme 'kanagawa-wave'
-
+      vim.cmd.colorscheme 'kanagawa'
       -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd.hi 'Comment gui=none'
     end,
     config = function()
       require('onedarkpro').setup {
