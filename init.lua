@@ -1066,6 +1066,9 @@ require('lazy').setup({
         },
 
         colors = {},
+        options = {
+          transparency = true,
+        },
       }
     end,
   },
