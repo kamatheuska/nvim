@@ -675,19 +675,6 @@ require('lazy').setup({
               useFlatConfig = true,
             },
             debug = true,
-            -- nodePath = '',
-            -- onIgnoredFiles = 'off',
-            -- problems = {
-            --   shortenToSingleLine = false,
-            -- },
-            -- quiet = fase,
-            -- rulesCustomizations = {},
-            -- run = 'onType',
-            -- useESLintClass = false,
-            -- validate = 'on',
-            -- workingDirectory = {
-            --   mode = 'location',
-            -- },
           },
           on_attach = function(client, bufnr)
             vim.api.nvim_create_autocmd('BufWritePre', {
@@ -707,6 +694,7 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
+
         ts_ls = {
           init_options = {
             preferences = {
@@ -715,7 +703,13 @@ require('lazy').setup({
             },
           },
         },
-
+        docker_compose_language_service = {
+          settings = {
+            cmd = { 'docker-compose-langserver', '--stdio' },
+            filetypes = { 'yaml.docker-compose', 'yml.docker-compose' },
+          },
+        },
+        dockerls = {},
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -747,6 +741,16 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = '.env.*',
+        command = 'set filetype=sh',
+      })
+
+      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = { 'docker-compose.*' },
+        command = 'set filetype=yaml.docker-compose',
+      })
 
       require('mason-lspconfig').setup {
         handlers = {
