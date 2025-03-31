@@ -463,10 +463,13 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+      vim.keymap.set('n', '<leader>sc', function()
+        local pickers = require 'custom.plugins.telescope.pickers'
+        pickers.ts_commands(require('telescope.themes').get_dropdown {})
+      end, { desc = '[S]earch [C]ommands' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -582,6 +585,7 @@ require('lazy').setup({
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          map('<leader>cx', function() end, '[C]ode [A]ction')
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -677,7 +681,7 @@ require('lazy').setup({
             },
             debug = true,
           },
-          on_attach = function(client, bufnr)
+          on_attach = function(_, bufnr)
             vim.api.nvim_create_autocmd('BufWritePre', {
               buffer = bufnr,
               command = 'EslintFixAll',
@@ -695,13 +699,17 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
-
         ts_ls = {
           init_options = {
             preferences = {
               importModuleSpecifierPreference = 'relative',
               importModuleSpecifierEnding = 'minimal',
+              preferTypeOnlyAutoImports = true,
             },
+          },
+          settings = {
+            codeAction = {},
+            codeActionOnSave = {},
           },
         },
         docker_compose_language_service = {
@@ -873,12 +881,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -893,8 +901,6 @@ require('lazy').setup({
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
-
       cmp.setup {
         snippet = {
           expand = function(args)
@@ -986,11 +992,6 @@ require('lazy').setup({
         colors = { -- add/modify theme and palette colors
           palette = {},
           theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
-        },
-        theme = 'wave',
-        background = {
-          dark = 'wave',
-          light = 'lotus',
         },
         overrides = function(colors)
           local theme = colors.theme
