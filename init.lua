@@ -94,6 +94,16 @@ vim.opt.relativenumber = true
 vim.b.disable_autoformat = false
 vim.g.disable_autoformat = false
 
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+vim.opt.tabstop = 4
+
+-- disable unwanted providers
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -173,11 +183,6 @@ vim.keymap.set('n', '<leader>ñ', vim.diagnostic.goto_next, { desc = 'Go to next
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Quickfix shortcuts
-vim.keymap.set('n', '<leader>n', '<cmd>cnext<CR>zz', { desc = 'Forward qfixlist' })
-vim.keymap.set('n', '<leader>p', '<cmd>cprev<CR>zz', { desc = 'Backward qfixlist' })
-vim.keymap.set('n', '<leader>p', '<cmd>cprev<CR>zz', { desc = 'Backward qfixlist' })
-
 -- Open vim buffer instead of floating window for lazygit
 -- https://github.com/kdheepak/lazygit.nvim/issues/22
 -- Set GIT_EDITOR to use nvr if Neovim and nvr are available
@@ -207,13 +212,28 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+--
+-- Custom commands
+--
+
+--
+-- Command to get the remote URL on github of a file
+--
 vim.keymap.set('n', '<leader>of', function()
   local repoUrl = vim.fn.trim(vim.fn.system "git remote get-url origin | sed 's/.git$//' | sed 's/.github.com:/.github.com\\//' | sed 's/git./https:\\/\\//'")
   local relative_path = '/blob/development/' .. vim.fn.expand '%:.'
   local url = repoUrl .. relative_path
   vim.notify('Opening url in the browser: ' .. url)
   os.execute('open ' .. url)
-end)
+end, { desc = 'Get remote URL from current file' })
+
+--
+-- Moving on a Quickfix list
+--
+vim.keymap.set('n', '<leader>cn', '<cmd>cnext<cr>zz', { desc = 'Move to the next item in a Quickfix list' })
+vim.keymap.set('n', '<leader>cp', '<cmd>cprev<cr>zz', { desc = 'Move to the previous item in a Quickfix list' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -390,8 +410,9 @@ require('lazy').setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
-      require('telescope').setup {
 
+      local lga_actions = require 'telescope-live-grep-args.actions'
+      require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
@@ -413,6 +434,17 @@ require('lazy').setup({
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
           },
+          live_grep_args = {
+            auto_quoting = true,
+            mappings = {
+              i = {
+                ['<C-k>'] = lga_actions.quote_prompt(),
+                ['<C-i>'] = lga_actions.quote_prompt { postfix = ' --iglob ' },
+                -- freeze the current list and start a fuzzy search in the frozen list
+                ['<C-space>'] = lga_actions.to_fuzzy_refine,
+              },
+            },
+          },
         },
       }
 
@@ -423,6 +455,7 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -430,10 +463,13 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+      vim.keymap.set('n', '<leader>sc', function()
+        local pickers = require 'custom.plugins.telescope.pickers'
+        pickers.ts_commands(require('telescope.themes').get_dropdown {})
+      end, { desc = '[S]earch [C]ommands' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -549,6 +585,7 @@ require('lazy').setup({
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          map('<leader>cx', function() end, '[C]ode [A]ction')
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -604,6 +641,8 @@ require('lazy').setup({
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local util = require 'lspconfig.util'
+
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
@@ -619,6 +658,35 @@ require('lazy').setup({
       local servers = {
         jsonls = {
           capabilities = capabilities,
+        },
+        eslint = {
+          cmd = { 'vscode-eslint-language-server', '--stdio' },
+          filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx', 'vue', 'svelte', 'astro' },
+          settings = {
+            codeAction = {
+              disableRuleComment = {
+                enable = true,
+                location = 'separateLine',
+              },
+              showDocumentation = {
+                enable = true,
+              },
+            },
+            codeActionOnSave = {
+              enable = false,
+              mode = 'all',
+            },
+            experimental = {
+              useFlatConfig = true,
+            },
+            debug = true,
+          },
+          on_attach = function(_, bufnr)
+            vim.api.nvim_create_autocmd('BufWritePre', {
+              buffer = bufnr,
+              command = 'EslintFixAll',
+            })
+          end,
         },
         -- clangd = {},
         -- gopls = {},
@@ -636,10 +704,21 @@ require('lazy').setup({
             preferences = {
               importModuleSpecifierPreference = 'relative',
               importModuleSpecifierEnding = 'minimal',
+              preferTypeOnlyAutoImports = true,
             },
           },
+          settings = {
+            codeAction = {},
+            codeActionOnSave = {},
+          },
         },
-
+        docker_compose_language_service = {
+          settings = {
+            cmd = { 'docker-compose-langserver', '--stdio' },
+            filetypes = { 'yaml.docker-compose', 'yml.docker-compose' },
+          },
+        },
+        dockerls = {},
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -672,6 +751,16 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = '.env.*',
+        command = 'set filetype=sh',
+      })
+
+      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = { 'docker-compose.*' },
+        command = 'set filetype=yaml.docker-compose',
+      })
+
       require('mason-lspconfig').setup {
         handlers = {
 
@@ -681,6 +770,17 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+
+            require('lspconfig').groovyls.setup {
+
+              cmd = { 'java', '-jar', '/Users/nramirez/.local/share/groovy-language-server/build/libs/groovy-language-server-all.jar' },
+              name = 'Groovy Language Server',
+              filetypes = { 'groovy' },
+              root_dir = function(fname)
+                return util.root_pattern 'Jenkinsfile'(fname) or vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1])
+              end,
+            }
+
             require('lspconfig')[server_name].setup(server)
           end,
         },
@@ -784,9 +884,9 @@ require('lazy').setup({
           {
             'rafamadriz/friendly-snippets',
             config = function()
-              local luasnip = require 'luasnip'
 
               require('luasnip.loaders.from_vscode').lazy_load()
+              local luasnip = require 'luasnip'
 
               luasnip.filetype_extend('html', { 'loremipsum' })
               luasnip.filetype_extend('html', { 'html' })
@@ -807,7 +907,7 @@ require('lazy').setup({
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
+
       cmp.setup {
         snippet = {
           expand = function(args)
@@ -886,15 +986,15 @@ require('lazy').setup({
     'rebelot/kanagawa.nvim',
     config = function()
       require('kanagawa').setup {
-        compile = false, -- enable compiling the colorscheme
+        compile = true, -- enable compiling the colorscheme
         undercurl = true, -- enable undercurls
         commentStyle = { italic = true },
-        functionStyle = {},
+        functionStyle = { bold = true },
         keywordStyle = { italic = true },
         statementStyle = { bold = true },
-        typeStyle = {},
-        transparent = false, -- do not set background color
-        dimInactive = false, -- dim inactive window `:h hl-NormalNC`
+        typeStyle = { italic = true, bold = true },
+        transparent = true, -- do not set background color
+        dimInactive = true, -- dim inactive window `:h hl-NormalNC`
         terminalColors = true, -- define vim.g.terminal_color_{0,17}
         colors = { -- add/modify theme and palette colors
           palette = {},
@@ -949,11 +1049,12 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight'
+
       -- vim.cmd.colorscheme 'nord'
       vim.cmd.colorscheme 'kanagawa-dragon'
 
       -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd.hi 'Comment gui=none'
     end,
     config = function()
       require('onedarkpro').setup {
@@ -980,6 +1081,9 @@ require('lazy').setup({
         },
 
         colors = {},
+        options = {
+          transparency = true,
+        },
       }
     end,
   },
