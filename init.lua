@@ -884,7 +884,13 @@ require('lazy').setup({
           {
             'rafamadriz/friendly-snippets',
             config = function()
+
               require('luasnip.loaders.from_vscode').lazy_load()
+              local luasnip = require 'luasnip'
+
+              luasnip.filetype_extend('html', { 'loremipsum' })
+              luasnip.filetype_extend('html', { 'html' })
+              luasnip.filetype_extend('typescriptreact', { 'html' })
             end,
           },
         },
@@ -901,6 +907,7 @@ require('lazy').setup({
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
+
       cmp.setup {
         snippet = {
           expand = function(args)
@@ -1042,7 +1049,10 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight'
-      vim.cmd.colorscheme 'kanagawa'
+
+      -- vim.cmd.colorscheme 'nord'
+      vim.cmd.colorscheme 'kanagawa-dragon'
+
       -- You can configure highlights by doing something like:
       -- vim.cmd.hi 'Comment gui=none'
     end,
