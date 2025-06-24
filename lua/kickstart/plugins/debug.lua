@@ -28,18 +28,17 @@ return {
     -- Installs the debug adapters for you
     'williamboman/mason.nvim',
     'jay-babu/mason-nvim-dap.nvim',
-
-    -- Install the vscode-js-debug adapter
-    {
-      'microsoft/vscode-js-debug',
-      -- After install, build it and rename the dist directory to out
-      build = 'npm install --legacy-peer-deps --no-save && npx gulp vsDebugServerBundle && rm -rf out && mv dist out',
-      version = '1.*',
-    },
   },
   config = function()
     local dap = require 'dap'
     local dapui = require 'dapui'
+    local mason_nvim_dap = require 'mason-nvim-dap'
+
+    dap.set_log_level 'TRACE'
+
+    mason_nvim_dap.setup {
+      ensure_installed = { 'js' },
+    }
 
     dap.adapters['pwa-node'] = {
       type = 'server',
@@ -47,7 +46,7 @@ return {
       port = '${port}',
       executable = {
         command = 'node',
-        args = { '/Users/nramirez/.local/share/js-debug/src/dapDebugServer.js', '${port}' },
+        args = { '/home/nicolas/.local/share/js-debug/out/src/vsDebugServer.js', '${port}' },
       },
     }
 
@@ -131,6 +130,12 @@ return {
       dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
     end, { desc = 'Debug: Set Breakpoint' })
 
+    vim.keymap.set('n', '<leader>dr', function()
+      dap.repl.open()
+    end)
+    vim.keymap.set('n', '<leader>dl', function()
+      dap.run_last()
+    end)
     vim.keymap.set('n', '<leader>da', function()
       if vim.fn.filereadable '.vscode/launch.json' then
         local dap_vscode = require 'dap.ext.vscode'
