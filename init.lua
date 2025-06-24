@@ -707,19 +707,19 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
-        ts_ls = {
-          init_options = {
-            preferences = {
-              importModuleSpecifierPreference = 'relative',
-              importModuleSpecifierEnding = 'minimal',
-              preferTypeOnlyAutoImports = true,
-            },
-          },
-          settings = {
-            codeAction = {},
-            codeActionOnSave = {},
-          },
-        },
+        -- ts_ls = {
+        --   init_options = {
+        --     preferences = {
+        --       importModuleSpecifierPreference = 'relative',
+        --       importModuleSpecifierEnding = 'minimal',
+        --       preferTypeOnlyAutoImports = true,
+        --     },
+        --   },
+        --   settings = {
+        --     codeAction = {},
+        --     codeActionOnSave = {},
+        --   },
+        -- },
         docker_compose_language_service = {
           settings = {
             cmd = { 'docker-compose-langserver', '--stdio' },
