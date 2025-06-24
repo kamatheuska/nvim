@@ -70,6 +70,7 @@ return {
           processId = require('dap.utils').pick_process,
           cwd = vim.fn.getcwd(),
           sourceMaps = true,
+          continueOnAttach = true,
         },
         -- Debug web applications (client side)
         {
