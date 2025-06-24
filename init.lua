@@ -412,6 +412,7 @@ require('lazy').setup({
       -- See `:help telescope` and `:help telescope.setup()`
 
       local lga_actions = require 'telescope-live-grep-args.actions'
+      local actions = require 'telescope.actions'
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
@@ -425,6 +426,12 @@ require('lazy').setup({
         pickers = {
           find_files = {
             find_command = { 'rg', '--files', '--hidden', '--glob', '!**/.git/*' },
+          },
+          buffers = {
+            mappings = {
+              i = { ['<c-d>'] = actions.delete_buffer },
+              n = { ['<c-d>'] = actions.delete_buffer },
+            },
           },
         },
         defaults = {
@@ -494,6 +501,7 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
+  { 'towolf/vim-helm', ft = 'helm' },
 
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
@@ -699,25 +707,31 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
-        ts_ls = {
-          init_options = {
-            preferences = {
-              importModuleSpecifierPreference = 'relative',
-              importModuleSpecifierEnding = 'minimal',
-              preferTypeOnlyAutoImports = true,
-            },
-          },
-          settings = {
-            codeAction = {},
-            codeActionOnSave = {},
-          },
-        },
+        -- ts_ls = {
+        --   init_options = {
+        --     preferences = {
+        --       importModuleSpecifierPreference = 'relative',
+        --       importModuleSpecifierEnding = 'minimal',
+        --       preferTypeOnlyAutoImports = true,
+        --     },
+        --   },
+        --   settings = {
+        --     codeAction = {},
+        --     codeActionOnSave = {},
+        --   },
+        -- },
         docker_compose_language_service = {
           settings = {
             cmd = { 'docker-compose-langserver', '--stdio' },
             filetypes = { 'yaml.docker-compose', 'yml.docker-compose' },
           },
         },
+        ['helm-ls'] = {
+          yamlls = {
+            path = 'yaml-language-server',
+          },
+        },
+        yamlls = {},
         dockerls = {},
         lua_ls = {
           -- cmd = {...},
@@ -964,6 +978,15 @@ require('lazy').setup({
     'arcticicestudio/nord-vim',
   },
   {
+    'navarasu/onedark.nvim',
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('onedark').setup {
+        style = 'darker',
+      }
+    end,
+  },
+  {
     'catppuccin/nvim',
     name = 'catppuccin',
     priority = 1000,
@@ -976,7 +999,7 @@ require('lazy').setup({
         },
         transparent_background = true, -- disables setting the background color.
         show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
-        term_colors = trye, -- sets terminal colors (e.g. `g:terminal_color_0`)
+        term_colors = true, -- sets terminal colors (e.g. `g:terminal_color_0`
         dim_inactive = {
           enabled = false, -- dims the background color of inactive window
           shade = 'dark',
@@ -1016,16 +1039,8 @@ require('lazy').setup({
           -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
         },
       }
-    end,
-  },
-  {
-    'navarasu/onedark.nvim',
-    priority = 1000, -- make sure to load this before all the other start plugins
-    config = function()
-      require('onedark').setup {
-        style = 'darker',
-      }
-      -- Enable theme
+      vim.cmd.colorscheme 'catppuccin'
+
     end,
   },
   { -- You can easily change to a different colorscheme.
@@ -1040,9 +1055,6 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight'
-
-      -- vim.cmd.colorscheme 'nord'
-      vim.cmd.colorscheme 'catppuccin-frappe'
 
       -- You can configure highlights by doing something like:
       -- vim.cmd.hi 'Comment gui=none'
