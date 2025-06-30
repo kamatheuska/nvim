@@ -46,8 +46,13 @@ return {
       port = '${port}',
       executable = {
         command = 'node',
-        args = { '/home/nicolas/.local/share/js-debug/out/src/vsDebugServer.js', '${port}' },
+        args = { '/Users/nramirez/.local/share/js-debug/src/dapDebugServer.js', '${port}' },
       },
+    }
+    dap.adapters.chrome = {
+      type = 'executable',
+      command = 'node',
+      args = { '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' }, -- TODO adjust
     }
 
     for _, language in ipairs(js_based_languages) do
@@ -71,9 +76,19 @@ return {
           sourceMaps = true,
           continueOnAttach = true,
         },
+        {
+          type = 'pwa-node',
+          request = 'attach',
+          name = 'Attach Port 9230',
+          processId = require('dap.utils').pick_process,
+          cwd = vim.fn.getcwd(),
+          port = 9230,
+          sourceMaps = true,
+          continueOnAttach = true,
+        },
         -- Debug web applications (client side)
         {
-          type = 'pwa-chrome',
+          type = 'chrome',
           request = 'launch',
           name = 'Launch & Debug Chrome',
           url = function()
@@ -91,10 +106,12 @@ return {
               end)
             end)
           end,
-          webRoot = vim.fn.getcwd(),
+          -- webRoot = vim.fn.getcwd(),
+          webRoot = '${workspaceFolder}',
           protocol = 'inspector',
           sourceMaps = true,
           userDataDir = false,
+          port = 9230,
         },
         -- Divider for the launch.json derived configs
         {
