@@ -112,7 +112,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
     vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
     vim.keymap.set('n', '<leader>sc', function()
-      local pickers = require 'custom.plugins.telescope.pickers'
+      local pickers = require '../telescope.pickers'
       pickers.ts_commands(require('telescope.themes').get_dropdown {})
     end, { desc = '[S]earch [C]ommands' })
     vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
